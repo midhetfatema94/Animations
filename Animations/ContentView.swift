@@ -8,29 +8,20 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var animationAmount: CGFloat = 1.0
+    @State private var animationAmountDegree = 0.0
+
     
     var body: some View {
         Button("Tap Me") {
-            animationAmount += 1
+            withAnimation(.interpolatingSpring(stiffness: 5, damping: 1)) {
+                self.animationAmountDegree += 360
+            }
         }
         .padding(50)
         .background(Color.red)
         .foregroundColor(.white)
         .clipShape(Circle())
-        .overlay(
-            Circle()
-            .stroke(Color.red)
-            .scaleEffect(animationAmount)
-            .opacity(Double(2 - animationAmount))
-            .animation(
-                Animation.easeInOut(duration: 1)
-                    .repeatForever(autoreverses: true)
-            )
-        )
-        .onAppear {
-            self.animationAmount = 2
-        }
+        .rotation3DEffect(.degrees(animationAmountDegree), axis: (x: 0, y: 0, z: 1))
     }
 }
 
