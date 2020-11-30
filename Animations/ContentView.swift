@@ -8,31 +8,42 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var stringArray = Array("Hello SwiftUI")
-    @State private var dragAmount = CGSize.zero
-    @State private var enabled = false
+    @State private var isShowingShape = false
     
     var body: some View {
-        HStack(spacing: 0) {
-            ForEach(0..<stringArray.count) {letterIndex in
-                Text(String(self.stringArray[letterIndex]))
-                    .padding(5)
-                    .font(.title)
-                    .background(enabled ? Color.red : Color.yellow)
-                    .foregroundColor(enabled ? Color.yellow : Color.red)
-                    .offset(dragAmount)
-                    .animation(Animation.default.delay(Double(letterIndex)/20))
+        VStack {
+            Button("Tap Me") {
+                withAnimation {
+                    self.isShowingShape.toggle()
+                }
+            }
+            if isShowingShape {
+                Rectangle()
+                    .fill(Color.red)
+                    .frame(width: 200, height: 200)
+                    .transition(.pivot)
             }
         }
-        .gesture(
-            DragGesture()
-                .onChanged {
-                    self.dragAmount = $0.translation
-                }
-                .onEnded {_ in
-                    self.dragAmount = .zero
-                    self.enabled.toggle()
-                }
+    }
+}
+
+struct CornerRotateModifier: ViewModifier {
+    let amount: Double
+    let anchorPoint: UnitPoint
+    
+    func body(content: Content) -> some View {
+        content.rotationEffect(.degrees(amount), anchor: anchorPoint)
+            .clipped()
+    }
+}
+
+extension AnyTransition {
+    static var pivot: AnyTransition {
+        .modifier(
+            active:
+                CornerRotateModifier(amount: -90, anchorPoint: .topLeading),
+            identity:
+                CornerRotateModifier(amount: 0, anchorPoint: .topLeading)
         )
     }
 }
